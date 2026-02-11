@@ -1,0 +1,3 @@
+/home/skyrim/Desktop/toy compiler/build/CMakeFiles/toy_compiler.dir
+/home/skyrim/Desktop/toy compiler/build/CMakeFiles/edit_cache.dir
+/home/skyrim/Desktop/toy compiler/build/CMakeFiles/rebuild_cache.dir
