@@ -2,7 +2,6 @@
 #include <string>
 #include <memory>
 #include <iostream>
-
 namespace ast {
 
 struct Node { virtual ~Node()=default; virtual void print(int indent=0) const=0; };
