@@ -24,7 +24,7 @@ source code → tokens → Abstract Syntax Tree (AST)
 ##  Requirements
 
 - C++11 or newer
-- g++, clang, or MSVC
+- g++
 
 ---
 
