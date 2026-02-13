@@ -1,24 +1,53 @@
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
-#include "parser/ast.hpp"
-
 #include <iostream>
-#include <string>
+#include <fstream>
+#include <sstream>
 
 int main() {
-    std::string code = "x := 10 + 3.14e-2 * (y ^ 2)";
-
-    lex::Lexer lexer(code);
-    parse::Parser parser(lexer);
-
+    std::string code = R"(
+        // Объявление переменных
+        int x = 42;
+        int y = 10;
+        
+        // Присваивание
+        x = x + 5;
+        
+        // Условие
+        if (x > y) {
+            x = x - y;
+        } else {
+            y = y + 1;
+        }
+        
+        // Цикл
+        int i = 0;
+        while (i < 5) {
+            i = i + 1;
+        }
+        
+        // Вызов функции
+        print("Hello, World!");
+    )";
+    
     try {
-        auto tree = parser.parseStatement();
-        std::cout << "Parsed AST:\n";
-        tree->print();
-    } catch(const std::exception& e){
-        std::cout << "Parse error: " << e.what() << "\n";
+        std::cout << "--- ЛЕКСИЧЕСКИЙ АНАЛИЗ ---" << std::endl;
+        Lexer lexer(code);
+        std::vector<Token> tokens = lexer.tokensize();
+        lexer.printTokens(tokens);
+        
+        std::cout << "\n--- СИНТАКСИЧЕСКИЙ АНАЛИЗ ---" << std::endl;
+        Parser parser(tokens);
+        auto ast = parser.parse();
+        
+        
+        parser.printAST(ast);
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Ошибка: " << e.what() << std::endl;
+        return 1;
     }
-
+    
     return 0;
 }
 
