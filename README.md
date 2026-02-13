@@ -62,9 +62,5 @@ If((Identifier(x) > Number(10)))
 
 ---
 
-##  Purpose
 
-This project is designed to demonstrate core compiler concepts:
-lexical analysis, parsing, and AST construction.
-It is intended for learning and experimentation.
 
