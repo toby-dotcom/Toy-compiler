@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/toy_compiler.dir/main.cpp.o CMakeFiles/toy_compiler.dir/parser/pars.cpp.o -o toy_compiler 
