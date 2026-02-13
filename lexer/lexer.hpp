@@ -18,6 +18,7 @@ enum class TokenType{
 	SEMICOLN, //  ;
 	STRING, 
 	COMMENT,
+	COMMA,
 	UNKNOWN,
 	END,
 };
@@ -28,6 +29,7 @@ struct Token{
 	int line;
 	int column;
 
+	Token() : type(TokenType::UNKNOWN), value(""), line(0), column(0) {}
 	Token(TokenType t, const std::string& v, int l, int c)
 		:type(t), value(v), line(l), column(c) {}
 };
@@ -51,7 +53,7 @@ private:
 	char peek();  //look next symbol
 	
 	Token readNumber();
-	Token readIndentifier();
+	Token readIdentifier();
 	Token readString();
 	Token readOperator();
 

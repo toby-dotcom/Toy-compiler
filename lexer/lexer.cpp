@@ -4,7 +4,7 @@
 
 Lexer::Lexer(const std::string& src)
 	: source(src), position(0), line(1), column(1){
-		if(!sourse.empty()){
+		if(!source.empty()){
 			currentChar = source[position];
 		}else{
 			currentChar = '\0';
@@ -148,7 +148,7 @@ Token Lexer::readOperator() {
     return Token(TokenType::OPERATOR, value, startLine, startColumn);
 }
 
-std::vector<Token> Lexer::tokenize() {
+std::vector<Token> Lexer::tokensize() {
     std::vector<Token> tokens;
     
     while (currentChar != '\0') {
@@ -203,7 +203,7 @@ std::vector<Token> Lexer::tokenize() {
                 advance();
                 break;
             case ';':
-                tokens.push_back(Token(TokenType::SEMICOLON, ";", line, column));
+                tokens.push_back(Token(TokenType::SEMICOLN, ";", line, column));
                 advance();
                 break;
             default:
@@ -236,7 +236,7 @@ void Lexer::printTokens(const std::vector<Token>& tokens) {
             case TokenType::RPAREN:     std::cout << "RPAREN    "; break;
             case TokenType::LBRACE:     std::cout << "LBRACE    "; break;
             case TokenType::RBRACE:     std::cout << "RBRACE    "; break;
-            case TokenType::SEMICOLON:  std::cout << "SEMICOLON "; break;
+            case TokenType::SEMICOLN:  std::cout << "SEMICOLN "; break;
             case TokenType::STRING:     std::cout << "STRING    "; break;
             case TokenType::COMMENT:    std::cout << "COMMENT   "; break;
             case TokenType::UNKNOWN:    std::cout << "UNKNOWN   "; break;
