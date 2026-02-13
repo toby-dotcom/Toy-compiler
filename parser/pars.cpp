@@ -68,10 +68,10 @@ std::vector<std::unique_ptr<ASTNode>> Parser::parse() {
         } catch (const std::exception& e) {
             std::cerr << "Ошибка парсинга: " << e.what() << std::endl;
             while (currentToken.type != TokenType::END && 
-                   currentToken.type != TokenType::SEMICOLON) {
+                   currentToken.type != TokenType::SEMICOLN) {
                 advance();
             }
-            if (currentToken.type == TokenType::SEMICOLON) {
+            if (currentToken.type == TokenType::SEMICOLN) {
                 advance();
             }
         }
@@ -113,7 +113,7 @@ std::unique_ptr<ASTNode> Parser::parseStatement() {
     
     auto expr = parseExpression();
     
-    if (currentToken.type == TokenType::SEMICOLON) {
+    if (currentToken.type == TokenType::SEMICOLN) {
         advance();
     }
     
@@ -135,10 +135,12 @@ std::unique_ptr<ASTNode> Parser::parseVarDeclaration() {
         initializer = parseExpression();
     }
     
-    expect(TokenType::SEMICOLON, "Ожидается ';' после объявления переменной");
+    expect(TokenType::SEMICOLN, "Ожидается ';' после объявления переменной");
     advance();
     
-    return std::make_unique<VarDeclarationNode>(type, name, std::move(initializer));
+    return std::unique_ptr<VarDeclarationNode>(
+        new VarDeclarationNode(type, name, std::move(initializer))
+    );
 }
 
 std::unique_ptr<ASTNode> Parser::parseAssignment() {
@@ -150,10 +152,12 @@ std::unique_ptr<ASTNode> Parser::parseAssignment() {
     
     auto value = parseExpression();
     
-    expect(TokenType::SEMICOLON, "Ожидается ';' после присваивания");
+    expect(TokenType::SEMICOLN, "Ожидается ';' после присваивания");
     advance();
     
-    return std::make_unique<AssignmentNode>(name, std::move(value));
+    return std::unique_ptr<AssignmentNode>(
+        new AssignmentNode(name, std::move(value))
+    );
 }
 
 std::unique_ptr<ASTNode> Parser::parseIfStatement() {
@@ -167,12 +171,10 @@ std::unique_ptr<ASTNode> Parser::parseIfStatement() {
     expect(TokenType::RPAREN, "Ожидается ')' после условия");
     advance();
     
-    auto ifNode = std::make_unique<IfNode>(std::move(condition));
+    auto ifNode = std::unique_ptr<IfNode>(new IfNode(std::move(condition)));
     
     if (match(TokenType::LBRACE)) {
-        auto block = parseBlock();
-        if (auto blockNode = dynamic_cast<IfNode*>(block.get())) {
-        }
+        parseBlock();  
     } else {
         ifNode->thenBody.push_back(parseStatement());
     }
@@ -181,13 +183,13 @@ std::unique_ptr<ASTNode> Parser::parseIfStatement() {
         advance();
         
         if (match(TokenType::LBRACE)) {
-            auto block = parseBlock();
+            parseBlock();
         } else {
             ifNode->elseBody.push_back(parseStatement());
         }
     }
     
-    return ifNode;
+    return std::move(ifNode);
 }
 
 std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
@@ -201,15 +203,15 @@ std::unique_ptr<ASTNode> Parser::parseWhileStatement() {
     expect(TokenType::RPAREN, "Ожидается ')' после условия");
     advance();
     
-    auto whileNode = std::make_unique<WhileNode>(std::move(condition));
+    auto whileNode = std::unique_ptr<WhileNode>(new WhileNode(std::move(condition)));
     
     if (match(TokenType::LBRACE)) {
-        auto block = parseBlock();
+        parseBlock();
     } else {
         whileNode->body.push_back(parseStatement());
     }
     
-    return whileNode;
+    return std::move(whileNode);
 }
 
 std::unique_ptr<ASTNode> Parser::parseBlock() {
@@ -234,7 +236,7 @@ std::unique_ptr<ASTNode> Parser::parseFunctionCall() {
     expect(TokenType::LPAREN, "Ожидается '(' после имени функции");
     advance();
     
-    auto funcCall = std::make_unique<FunctionCallNode>(name);
+    auto funcCall = std::unique_ptr<FunctionCallNode>(new FunctionCallNode(name));
     
     // paring arguments 
     if (currentToken.type != TokenType::RPAREN) {
@@ -249,10 +251,10 @@ std::unique_ptr<ASTNode> Parser::parseFunctionCall() {
     expect(TokenType::RPAREN, "Ожидается ')' после аргументов");
     advance();
     
-    expect(TokenType::SEMICOLON, "Ожидается ';' после вызова функции");
+    expect(TokenType::SEMICOLN, "Ожидается ';' после вызова функции");
     advance();
     
-    return funcCall;
+    return std::move(funcCall);
 }
 
 //parsing operators
@@ -273,7 +275,9 @@ std::unique_ptr<ASTNode> Parser::parseComparison() {
         std::string op = currentToken.value;
         advance();
         auto right = parseAdditive();
-        left = std::make_unique<BinaryOpNode>(op, std::move(left), std::move(right));
+        left = std::unique_ptr<BinaryOpNode>(
+            new BinaryOpNode(op, std::move(left), std::move(right))
+        );
     }
     
     return left;
@@ -287,7 +291,9 @@ std::unique_ptr<ASTNode> Parser::parseAdditive() {
         std::string op = currentToken.value;
         advance();
         auto right = parseMultiplicative();
-        left = std::make_unique<BinaryOpNode>(op, std::move(left), std::move(right));
+        left = std::unique_ptr<BinaryOpNode>(
+            new BinaryOpNode(op, std::move(left), std::move(right))
+        );
     }
     
     return left;
@@ -301,7 +307,9 @@ std::unique_ptr<ASTNode> Parser::parseMultiplicative() {
         std::string op = currentToken.value;
         advance();
         auto right = parsePrimary();
-        left = std::make_unique<BinaryOpNode>(op, std::move(left), std::move(right));
+        left = std::unique_ptr<BinaryOpNode>(
+            new BinaryOpNode(op, std::move(left), std::move(right))
+        );
     }
     
     return left;
@@ -309,15 +317,19 @@ std::unique_ptr<ASTNode> Parser::parseMultiplicative() {
 
 std::unique_ptr<ASTNode> Parser::parsePrimary() {
     if (match(TokenType::NUMBER)) {
-        auto node = std::make_unique<NumberNode>(currentToken.value);
+        auto node = std::unique_ptr<NumberNode>(
+            new NumberNode(currentToken.value)
+        );
         advance();
-        return node;
+        return std::move(node);
     }
     
     if (match(TokenType::STRING)) {
-        auto node = std::make_unique<StringNode>(currentToken.value);
+        auto node = std::unique_ptr<StringNode>(
+            new StringNode(currentToken.value)
+        );
         advance();
-        return node;
+        return std::move(node);
     }
     
     if (match(TokenType::IDENTIFIER)) {
@@ -325,9 +337,11 @@ std::unique_ptr<ASTNode> Parser::parsePrimary() {
             return parseFunctionCall();
         }
         
-        auto node = std::make_unique<IdentifierNode>(currentToken.value);
+        auto node = std::unique_ptr<IdentifierNode>(
+            new IdentifierNode(currentToken.value)
+        );
         advance();
-        return node;
+        return std::move(node);
     }
     
     if (match(TokenType::LPAREN)) {
@@ -340,9 +354,11 @@ std::unique_ptr<ASTNode> Parser::parsePrimary() {
     
     if (match(TokenType::KEYWORD) && 
         (currentToken.value == "true" || currentToken.value == "false")) {
-        auto node = std::make_unique<IdentifierNode>(currentToken.value);
+        auto node = std::unique_ptr<IdentifierNode>(
+            new IdentifierNode(currentToken.value)
+        );
         advance();
-        return node;
+        return std::move(node);
     }
     
     std::cerr << "Неожиданный токен: " << currentToken.value << std::endl;

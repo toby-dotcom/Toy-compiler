@@ -1,7 +1,7 @@
 #ifndef PARSER_HPP
 #define PARSER_HPP
 
-#include "lexer.hpp"
+#include "../lexer/lexer.hpp"
 #include <vector>
 #include <memory>
 #include <string>
