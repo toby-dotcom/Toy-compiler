@@ -31,7 +31,7 @@ source code → tokens → Abstract Syntax Tree (AST)
 ##  Build & Run
 
 ```bash
-g++ -std=c++11 lexer.cpp parser.cpp main.cpp -o compiler
+g++ -std=c++11 lexer.cpp pars.cpp main.cpp -o compiler
 ./compiler
 ```
 
